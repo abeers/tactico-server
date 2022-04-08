@@ -14,13 +14,17 @@ router.get('/games', (req, res, next) => {
 router.post('/games', (req, res, next) => {
     Game.create({})
         .then(game => {
-            const gameSize = 9
-            for (let i = 0; i < gameSize; i++) {
-                game.cells.push({
-                    value: '',
-                    isDefended: false,
-                    position: i
-                })
+            const gameRows = 3
+            const gameColumns = 3
+            for (let i = 0; i < gameRows; i++) {
+                game.cells.push([])
+                for (let j = 0; j < gameColumns; j++) {
+                    game.cells[i].push({
+                        value: '',
+                        isDefended: false,
+                        position: gameRows * i + j
+                    })
+                }
             }
 
             return game.save()

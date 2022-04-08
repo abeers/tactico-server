@@ -7,7 +7,7 @@ const cellSchema = new mongoose.Schema({
 }, {})
 
 const gameSchema = new mongoose.Schema({
-    cells: [cellSchema]
+    cells: [[cellSchema]]
 }, {
     timestamps: true
 })
