@@ -2,9 +2,12 @@ const mongoose = require('mongoose')
 
 const cellSchema = new mongoose.Schema({
     value: String,
-    position: Number,
+    row: Number,
+    column: Number,
     isDefended: Boolean
-}, {})
+}, {
+    timestamps: true
+})
 
 const gameSchema = new mongoose.Schema({
     cells: [[cellSchema]]

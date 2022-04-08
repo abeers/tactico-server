@@ -22,7 +22,8 @@ router.post('/games', (req, res, next) => {
                     game.cells[i].push({
                         value: '',
                         isDefended: false,
-                        position: gameRows * i + j
+                        row: i,
+                        column: j
                     })
                 }
             }
@@ -34,6 +35,23 @@ router.post('/games', (req, res, next) => {
             res.status(201).json({ game })
         })
         .catch(next)
+})
+
+router.patch('/games/:id', (req, res, next) => {
+	const {id, row, value} = req.body
+    
+    Game.findById(req.params.id)
+		.then((game) => {
+			const cellToUpdate = game.cells[row].id(id)
+            cellToUpdate.value = value
+
+			return game.save()
+		})
+		.then((game) => {
+			console.log(game)
+			res.status(200).json({ game })
+		})
+		.catch(next)
 })
 
 module.exports = router
