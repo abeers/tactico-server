@@ -1,5 +1,6 @@
 const express = require('express')
 const Game = require('../models/game')
+const { gameRows, gameColumns, checkForWin } = require('../lib/game_logic')
 
 const router = express.Router()
 
@@ -14,14 +15,11 @@ router.get('/games', (req, res, next) => {
 router.post('/games', (req, res, next) => {
     Game.create({})
         .then(game => {
-            const gameRows = 3
-            const gameColumns = 3
+            // Construct multidimensional cells array
             for (let i = 0; i < gameRows; i++) {
                 game.cells.push([])
                 for (let j = 0; j < gameColumns; j++) {
                     game.cells[i].push({
-                        value: '',
-                        isDefended: false,
                         row: i,
                         column: j
                     })
@@ -31,7 +29,6 @@ router.post('/games', (req, res, next) => {
             return game.save()
         })
         .then(game => {
-            console.log(game)
             res.status(201).json({ game })
         })
         .catch(next)
@@ -43,12 +40,16 @@ router.patch('/games/:id', (req, res, next) => {
     Game.findById(req.params.id)
 		.then((game) => {
 			const cellToUpdate = game.cells[row].id(id)
-            cellToUpdate.value = value
 
-			return game.save()
+			// If the game is not over and the cell is empty, update cell and check for win
+			if (!game.isOver && cellToUpdate.value === '') {
+				cellToUpdate.value = value
+				checkForWin(game, cellToUpdate)
+
+				return game.save()
+			}
 		})
 		.then((game) => {
-			console.log(game)
 			res.status(200).json({ game })
 		})
 		.catch(next)
