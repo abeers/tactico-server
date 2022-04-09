@@ -1,6 +1,6 @@
 const express = require('express')
 const Game = require('../models/game')
-const { gameRows, gameColumns, checkForWin } = require('../lib/game_logic')
+const { gameRows, gameColumns, checkForWin, resetDefenses } = require('../lib/game_logic')
 
 const router = express.Router()
 
@@ -35,16 +35,28 @@ router.post('/games', (req, res, next) => {
 })
 
 router.patch('/games/:id', (req, res, next) => {
-	const {id, row, value} = req.body
+	const {id, row, value, isAttacking} = req.body
     
     Game.findById(req.params.id)
 		.then((game) => {
 			const cellToUpdate = game.cells[row].id(id)
 
-			// If the game is not over and the cell is empty, update cell and check for win
+			// If the game is not over and the cell is empty...
 			if (!game.isOver && cellToUpdate.value === '') {
-				cellToUpdate.value = value
-				checkForWin(game, cellToUpdate)
+                // And the player is defending...
+                if (!isAttacking) {
+                    // Defend the cell
+                    cellToUpdate.isDefended = true
+                } else {
+                    // If the player is attacking and the cell has not been defended...
+                    if (!cellToUpdate.isDefended) {
+                        // update the value and check for wins
+                        cellToUpdate.value = value
+					    checkForWin(game, cellToUpdate)
+                    } 
+                    // Reset the defenses after every attack
+                    resetDefenses(game.cells)
+                }
 
 				return game.save()
 			}
