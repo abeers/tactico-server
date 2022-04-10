@@ -12,6 +12,14 @@ router.get('/games', (req, res, next) => {
         .catch(next)
 })
 
+router.get('/games/:id', (req, res, next) => {
+	Game.findById(req.params.id)
+		.then((game) => {
+			res.status(200).json({ game })
+		})
+		.catch(next)
+})
+
 router.post('/games', (req, res, next) => {
     Game.create({})
         .then(game => {
@@ -29,6 +37,7 @@ router.post('/games', (req, res, next) => {
             return game.save()
         })
         .then(game => {
+            req.io.emit('CreatedGame', { game })
             res.status(201).json({ game })
         })
         .catch(next)
@@ -62,6 +71,7 @@ router.patch('/games/:id', (req, res, next) => {
 			}
 		})
 		.then((game) => {
+            req.io.emit('UpdatedGame', { game })
 			res.status(200).json({ game })
 		})
 		.catch(next)

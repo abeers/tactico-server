@@ -25,15 +25,7 @@ const gameSchema = new mongoose.Schema(
 		winner: {
 			type: String,
 			default: '',
-		},
-		player1Cells: {
-			type: Number,
-			default: 0,
-		},
-		player2Cells: {
-			type: Number,
-			default: 0,
-		},
+		}
 	},
 	{
 		timestamps: true,
