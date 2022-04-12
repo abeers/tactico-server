@@ -4,7 +4,9 @@ const socketIo = require('socket.io')
 const mongoose = require('mongoose')
 const cors = require('cors')
 
+const auth = require('./lib/auth')
 const gameRoutes = require('./routes/game_routes.js')
+const userRoutes = require('./routes/user_routes')
 const errorHandler = require('./lib/error_handler.js')
 
 const serverPort = 4741
@@ -21,6 +23,7 @@ const io = socketIo(server, {
 })
 
 app.use(express.json())
+app.use(auth)
 app.use(
 	cors({
 		origin: 'http://localhost:3000',
@@ -47,6 +50,7 @@ app.use((req, res, next) => {
 // })
 
 app.use(gameRoutes)
+app.use(userRoutes)
 
 app.use(errorHandler)
 
