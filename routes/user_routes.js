@@ -20,9 +20,9 @@ router.post('/sign-up', (req, res, next) => {
       if (
         !credentials ||
         !credentials.password ||
-        credentials.password !== credentials.password_confirmation
+        credentials.password !== credentials.passwordConfirmation
       ) {
-        throw new BadParamsError()
+        // throw new BadParamsError()
       }
     })
     .then(() => {
@@ -45,7 +45,7 @@ router.post('/sign-in', (req, res, next) => {
 
   let user
 
-  User.findOne({ $or: [{ email: identifier }, { username: identifier }]})
+  User.findOne({ $or: [{ email: identifier }, { username: identifier }] })
     .then((foundUser) => {
       user = foundUser
       return bcrypt.compare(password, user.hashedPassword)
@@ -73,13 +73,13 @@ router.patch('/change-password', requireToken, (req, res, next) => {
     .then((foundUser) => {
       user = foundUser
 
-      return bcrypt.compare(req.body.passwords.old, user.hashedPassword)
+      return bcrypt.compare(req.body.passwords.oldPassword, user.hashedPassword)
     })
     .then((correctPassword) => {
-    //   if (!correctPassword || !req.body.passwords.new) {
-    //     throw new BadParamsError()
-    //   }
-      return bcrypt.hash(req.body.passwords.new, 10)
+      //   if (!correctPassword || !req.body.passwords.new) {
+      //     throw new BadParamsError()
+      //   }
+      return bcrypt.hash(req.body.passwords.newPassword, 10)
     })
     .then((hash) => {
       user.hashedPassword = hash
@@ -92,7 +92,8 @@ router.patch('/change-password', requireToken, (req, res, next) => {
 router.delete('/sign-out', requireToken, (req, res, next) => {
   // "invalidate" old token by setting user's token to `null`
   req.user.token = null
-  req.user.save()
+  req.user
+    .save()
     .then(() => res.sendStatus(204))
     .catch(next)
 })
